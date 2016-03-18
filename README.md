@@ -53,5 +53,6 @@ ruby gpg.rb -d -m Schneier -p "YOUR_CRIPT_FILE"
 
 
 ### Dimostrazione
-Qui di seguido un video dimostrativo della nostra applicazione:
+
 @[](https://www.youtube.com/watch?v=0DmhFTv3nbk)
+
