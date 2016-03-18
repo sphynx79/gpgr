@@ -1,8 +1,12 @@
-
 # Gpgr: Criptare e descriptare dati con gpg in Ruby
 &nbsp;
 
-[TOC]
+## Contents
+- [Introduzione](#Introduzione)
+- [Descrizione](#Descrizione)
+- [Utilizzo](#Utilizzo)
+	- [Criptare](#Criptare)
+	- [Decriptare](#Decriptare)
 
 &nbsp;
 
@@ -49,9 +53,6 @@ E' possibile specificare il metodo di eliminazione:
 ```
 ruby gpg.rb -d -m Schneier -p "YOUR_CRIPT_FILE"
 ```
-&nbsp;
 
 
-### Dimostrazione
-<iframe width="560" height="315" src="http://www.youtube.com/embed/QH2-TGUlwu4" frameborder="0"></iframe>
 
