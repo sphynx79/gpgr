@@ -53,6 +53,6 @@ ruby gpg.rb -d -m Schneier -p "YOUR_CRIPT_FILE"
 
 
 ### Dimostrazione
-
-@[](https://www.youtube.com/watch?v=0DmhFTv3nbk)
+@[하루패드 첫번째 트윗](https://twitter.com/haroopad/status/337257711827841024)
+@[prova](https://www.youtube.com/watch?v=0DmhFTv3nbk)
 
