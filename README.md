@@ -7,7 +7,6 @@
 - [Utilizzo](#Utilizzo)
 	- [Criptare](#Criptare)
 	- [Decriptare](#Decriptare)
-
 &nbsp;
 
 ### Introduzione

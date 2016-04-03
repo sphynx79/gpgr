@@ -11,7 +11,7 @@ class Gpg
    attr_accessor :operation, :method, :path, :nome_file, :file, :gpg_file
    def initialize(data = {})
       @operation        = if data[:encrypt] then "encrypt" else "decrypt" end
-      @method           = if data[:method].nil? then "Gutmann" else data[:method] end
+      @method           = data[:method]
       @path             = data[:path]
       @nome_file        = path.split('\\')[-1]
       @file             = if not @nome_file.include? "." then  path.gsub(nome_file, "#{nome_file}.zip") else path end
@@ -27,6 +27,7 @@ class Gpg
    end
 
    def start_encrypt
+      puts "Avvio encrypt:"
       if directory?
          file_zip = crea_archivio
          encrypt
@@ -40,6 +41,7 @@ class Gpg
    end
 
    def start_decrypt
+      puts "Avvio decrypt:"
       decrypt_file = decrypt
       if decrypt_file.include? ".zip"
          estrai_archivio decrypt_file
@@ -49,9 +51,11 @@ class Gpg
    end
 
    def estrai_archivio decrypt_file
-      Open3.popen3("#{ZIP}  x -y  \"#{decrypt_file}\"") do |stdin, stdout, stderr, wait_thr|
+      output = @path.gsub("\\"+File.basename(@path),"")
+      Open3.popen3("#{ZIP}  x -y  \"#{decrypt_file}\" -o\"#{output}\" | FIND /V \"ing  \"") do |stdin, stdout, stderr, wait_thr|
          stdout.each_line { |line| puts line}
       end
+      puts "estratto file #{decrypt_file}"
    end
 
    def decrypt
@@ -62,14 +66,16 @@ class Gpg
       Open3.popen3( "#{GPG} --output \"#{decrypt_file}\" -d \"#{path}\"") do |stdin, stdout, stderr, wait_thr|
          stdout.each_line { |line| puts line }
       end
+      puts "decryptato file #{path}"
       return decrypt_file
    end
 
    def crea_archivio
       zip = path.gsub(nome_file, "#{nome_file}.zip")
-      Open3.popen3("#{ZIP}  a -tzip \"#{zip}\" \"#{path}\\\" -mx0") do |stdin, stdout, stderr, wait_thr|
-         stdout.each_line { |line| puts line }
+      Open3.popen3("#{ZIP}  a -tzip \"#{zip}\" \"#{path}\\\" -mx0 ") do |stdin, stdout, stderr, wait_thr|
+         stderr.each_line { |line| puts line }
       end
+      puts "archivio creato #{zip}"
       return zip
    end
 
@@ -81,14 +87,16 @@ class Gpg
          #pid = wait_thr.pid
          #exit_status = wait_thr.value
       end
+      puts "creato file #{gpg_file} cryptato"
    end
 
    def elimina_file type, file_da_eliminare
-      Open3.popen3( "#{ERASER}  -method #{method} -queue -resultsonerror -#{type} \"#{file_da_eliminare}\"") do |stdin, stdout, stderr, wait_thr|
+      Open3.popen3( "#{ERASER}  -method #{method} -queue -resultsonerror -#{type} \"#{file_da_eliminare}\" -subfolders") do |stdin, stdout, stderr, wait_thr|
          stdout.each_line { |line| puts line }
          #pid = wait_thr.pid
          #exit_status = wait_thr.value
       end
+      puts "file #{file_da_eliminare} eliminato"
    end
 
    def directory?
@@ -145,6 +153,7 @@ begin
       puts optparse                                                  
       exit                                                           
    end 
+
    if missing.size == 2                                          
       puts "Selezionare -e oppure -d, senza questi non posso continuare"                                         
       puts optparse                                                  
@@ -160,19 +169,20 @@ begin
    end 
 
    data = [:method]
-   metodi = ["Gutmann" , "DoD" , "DoD_E" , "First_Last2k" , "Schneier" , "Random"  , "Library"]
+   missing = data.select{|param| options[param].nil?}
+   if not missing.empty?                                            
+      puts "Metodo non selezionato verra usato di default Schneier(35 pass)" 
+      options[:method] = "Gutmann"
+   end 
 
-   if not metodi.include? options[:method]  && if not options[:method].nil?
+   metodi = ["Gutmann" , "DoD" , "DoD_E" , "First_Last2k" , "Schneier" , "Random"  , "Library"]
+   if not metodi.include? options[:method]
       puts "Metodo inserito per eraser non corretto deve selezionare uno di quest algoritmi:"
       puts "Gutmann | DoD | DoD_E | First_Last2k | Schneier | Random  | Library"
       puts optparse                                                  
       exit         
    end
-end
-missing = data.select{|param| options[param].nil?}
-if not missing.empty?                                            
-   puts "Metodo non selezionato verra usato di default Schneier(35 pass)"                                                                                                                                                  
-end 
+
 
 rescue OptionParser::InvalidOption, OptionParser::MissingArgument      
    # Con $! stampo ERROR_INFO 
